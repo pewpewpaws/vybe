@@ -1,0 +1,423 @@
+/* ─── Tailwind directives ─────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties ───────────────────────────────────────────── */
+:root {
+  /* Amber Obsidian Autumn (background) */
+  --space-950: #1d1816;
+  --space-900: #241d1a;
+  --space-800: #332722;
+  --space-700: #46352d;
+  --space-600: #5a463c;
+  --space-500: #7a7a78;
+
+  /* Beat accents */
+  --beat-purple: #691f0c;
+  --beat-violet: #dc3c0c;
+  --beat-lilac: #d3c0b2;
+  --beat-rose: #dc3c0c;
+  --beat-amber: #e1e1e1;
+
+  /* ── Raw RGB channels (use with rgba() in components) ─────────────────
+     e.g.  background: rgba(var(--rgb-accent), 0.18);                     */
+  --rgb-bg:        36, 29, 26;     /* --space-900 */
+  --rgb-bg-deep:   29, 24, 22;     /* --space-950 */
+  --rgb-accent:    220, 60, 12;    /* --beat-violet  (amber ember) */
+  --rgb-accent2:   211, 192, 178;  /* --beat-lilac   (soft porcelain) */
+  --rgb-accent3:   105, 31, 12;    /* --beat-purple  (deep umber) */
+  --rgb-accent-dk: 105, 31, 12;    /* --beat-purple  (deep umber) */
+
+  /* Surface glass system */
+  --surface: rgba(var(--rgb-accent2), 0.05);
+  --surface-hover: rgba(var(--rgb-accent2), 0.075);
+  --surface-border: rgba(var(--rgb-accent2), 0.09);
+  --surface-muted: rgba(var(--rgb-accent2), 0.035);
+  --glass-blur: 8px;
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Typography */
+  --font-display: 'Syne', sans-serif;
+  --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Animation timing */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ─── Golden Ratio spacing scale (φ = 1.618, base = 4px) ──────────────
+     φ0 = 4px  │ φ1 = 6px  │ φ2 = 10px │ φ3 = 16px │ φ4 = 26px
+     φ5 = 42px │ φ6 = 68px │ φ7 = 110px │ φ8 = 178px │ φ9 = 288px */
+  --phi-0: 0.25rem;    /*   4px */
+  --phi-1: 0.375rem;   /*   6px */
+  --phi-2: 0.625rem;   /*  10px */
+  --phi-3: 1rem;       /*  16px */
+  --phi-4: 1.625rem;   /*  26px */
+  --phi-5: 2.625rem;   /*  42px */
+  --phi-6: 4.25rem;    /*  68px */
+  --phi-7: 6.875rem;   /* 110px */
+  --phi-8: 11.125rem;  /* 178px */
+  --phi-9: 18rem;      /* 288px */
+
+  /* ─── Golden Ratio typography scale (base = 16px = phi-body) ────────
+     phi-xs   =   6px  — captions, badges
+     phi-sm   =  10px  — small UI text, meta
+     phi-body =  16px  — body copy  (line-height = φ = 1.618)
+     phi-sub  =  26px  — subheadings
+     phi-h    =  42px  — section headings
+     phi-d    =  68px  — display titles
+     phi-hero = 110px  — hero / splash text */
+  --phi-xs:   0.375rem;   /*   6px */
+  --phi-sm:   0.625rem;   /*  10px */
+  --phi-body: 1rem;       /*  16px */
+  --phi-sub:  1.625rem;   /*  26px */
+  --phi-h:    2.625rem;   /*  42px */
+  --phi-d:    4.25rem;    /*  68px */
+  --phi-hero: 6.875rem;   /* 110px */
+}
+
+/* ─── Base Reset ──────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* Prevent text selection flash on rapid taps (mobile UX) */
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Prevent mobile font boosting — keeps Golden Ratio scale intact */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--space-900);
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: var(--phi-body);   /* 16px — golden ratio base */
+  line-height: 1.618;           /* φ — mathematically perfect for body text */
+  min-height: 100dvh;
+  overflow-x: hidden;
+  /* Prevent overscroll bounce — native app feel */
+  overscroll-behavior: none;
+  /* iOS safe areas — respect notch / home indicator */
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Typography scale ────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(167, 139, 250, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(167, 139, 250, 0.5);
+}
+
+/* ─── Selection ───────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(167, 139, 250, 0.35);
+  color: #ffffff;
+}
+
+/* ─── Focus ring (accessibility) ────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--beat-violet);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ─── Mobile Touch Optimizations ─────────────────────────────────────── */
+
+/* Fitts' Law: Min 44×44px touch target (Apple HIG / WCAG 2.5.8).
+   Apply to all interactive elements that need to meet touch guidelines. */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Prevent scroll-anchoring jank during list re-renders */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* Active states for touch — mobile has no hover */
+@media (hover: none) and (pointer: coarse) {
+  .glass-hover:active {
+    background: var(--surface-hover);
+    border-color: rgba(167, 139, 250, 0.25);
+  }
+  .glass-hover:hover {
+    background: var(--surface);  /* Reset hover on touch — no sticky hover */
+    border-color: inherit;
+  }
+}
+
+/* ─── Utility: Glass card surface ───────────────────────────────────── */
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--glass-shadow), var(--glass-highlight);
+}
+
+.glass-hover {
+  transition: background 0.2s var(--ease-smooth),
+              border-color 0.2s var(--ease-smooth),
+              box-shadow 0.2s var(--ease-smooth);
+}
+.glass-hover:hover {
+  background: var(--surface-hover);
+  border-color: rgba(var(--rgb-accent), 0.28);
+}
+
+/* ─── Utility: Gradient text ─────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--beat-lilac) 0%, var(--beat-rose) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Utility: Ambient glow background ──────────────────────────────── */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-bg::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(220,60,12,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.ambient-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -15%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(ellipse, rgba(105,31,12,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: rgba(var(--rgb-bg-deep), 0.82);
+  }
+}
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  :root {
+    --surface: rgba(var(--rgb-bg-deep), 0.58);
+    --surface-hover: rgba(var(--rgb-bg-deep), 0.72);
+    --surface-border: rgba(var(--rgb-accent2), 0.08);
+    --glass-blur: 4px;
+    --glass-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+  }
+
+  .ambient-bg::before,
+  .ambient-bg::after {
+    opacity: 0.75;
+    transform: scale(0.92);
+  }
+}
+
+/* ─── Skeleton shimmer ───────────────────────────────────────────────── */
+/*  A left-to-right highlight sweep on a dark base.                       */
+/*  Uses the beat-violet hue so it feels on-brand, not plain grey.        */
+@keyframes shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(211,192,178,0.04) 0%,
+    rgba(211,192,178,0.04) 30%,
+    rgba(220,60,12,0.16) 50%,
+    rgba(211,192,178,0.04) 70%,
+    rgba(211,192,178,0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* ─── Utility: Hide scrollbar but keep functionality ────────────────── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+
+/* ─── Utility: Marquee on hover ───────────────────────────────────────── */
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+}
+.marquee-content {
+  display: inline-block;
+  white-space: nowrap;
+  transition: transform 3s linear;
+}
+.group:hover .marquee-content {
+  /* Simple scroll based on a rough estimation or just scroll enough to see common long names */
+  transform: translateX(min(0px, calc(100% - 100%))); /* Placeholder logic */
+}
+
+/* Better approach using keyframes for continuous scroll if hovered */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.hover-marquee:hover .marquee-scrollable {
+  animation: marquee-scroll 10s linear infinite;
+}
+
+@keyframes login-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+}
+
+.animate-login-drift {
+  animation: login-drift 34s linear infinite;
+}
+
+.loader-mark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.375rem;
+  height: 1.75rem;
+}
+
+.loader-mark span {
+  width: 0.42rem;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(225,225,225,0.95) 0%, rgba(220,60,12,0.92) 100%);
+  box-shadow: 0 0 18px rgba(220,60,12,0.24);
+  animation: loader-pulse 0.9s ease-in-out infinite;
+}
+
+.loader-mark span:nth-child(1) {
+  height: 0.9rem;
+  animation-delay: 0s;
+}
+
+.loader-mark span:nth-child(2) {
+  height: 1.55rem;
+  animation-delay: 0.12s;
+}
+
+.loader-mark span:nth-child(3) {
+  height: 1.1rem;
+  animation-delay: 0.24s;
+}
+
+@keyframes loader-pulse {
+  0%, 100% {
+    transform: scaleY(0.72);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/*
+ * routeFallbackReveal — delays RouteFallback becoming visible by 150 ms.
+ *
+ * Root cause: during AnimatePresence mode="wait" transitions, the new
+ * PageTransition mounts while React concurrent mode may suspend the lazy
+ * component for one interruptible tick — showing RouteFallback briefly.
+ * With this delay, preloaded routes resolve before the animation fires,
+ * so the fallback element is painted but never seen. Slow loads still
+ * reveal it gracefully after the threshold.
+ */
+@keyframes routeFallbackReveal {
+  to { opacity: 1; }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── GPU compositing hints for animated elements ───────────────────── */
+.ambient-bg,
+.ambient-bg::before,
+.ambient-bg::after,
+.animate-login-drift,
+.animate-pulse-glow,
+.animate-float-y {
+  will-change: transform;
+  transform: translateZ(0);   /* Force compositor layer */
+}
+
+/* ─── Safe-area bottom padding utility ──────────────────────────────── */
+/* Use on sticky / fixed bottom elements so they clear the home indicator */
+.pb-safe {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+}
+.bottom-safe {
+  bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+}

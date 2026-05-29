@@ -5,9 +5,10 @@ venv/
 .opencode
 AGENTS.md
 db.md
-
+.agents/
+graphify-out/
 MusicSynthesizer/
-
+./braind/
 __pycache__/
 *.py[cod]
 *.pyo

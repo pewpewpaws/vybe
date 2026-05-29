@@ -11,14 +11,12 @@ class ProfileResponse(CamelModel):
     etlab_id: str | None = None
     email: str
     name: str
-    register_number: str | None = None
+    academic_year: str | None = None
     etlab_verified: bool
     avatar_url: str | None = None
-    vibe_profile: dict[str, Any] = Field(default_factory=dict)
-    onboarding_completed: bool
     spotify_connected: bool
+    onboarding_completed: bool = False
     created_at: datetime
-    updated_at: datetime
 
 
 class ProfilePreview(CamelModel):

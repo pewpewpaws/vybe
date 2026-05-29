@@ -81,6 +81,10 @@ export function LoginPage() {
     }
   }
 
+  function handleEtlabSignIn() {
+    alert("ETLab Login will be implemented later")
+  }
+
   return (
     <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-space-950">
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
@@ -151,9 +155,9 @@ export function LoginPage() {
         >
           <div className="glass rounded-3xl border border-white/10 bg-[rgba(24,20,18,0.78)] p-4">
             <div className="mb-4 text-center">
-              <p className="font-body text-sm font-medium text-white">Sign in with Google</p>
+              <p className="font-body text-sm font-medium text-white">Sign in to Vyne</p>
               <p className="mt-1 font-body text-xs text-white/40">
-                Use Google for account access. ETLab verification comes after login.
+                Use Google or ETLab for account access.
               </p>
             </div>
 
@@ -184,6 +188,22 @@ export function LoginPage() {
                 </svg>
                 <p className="font-body text-base font-medium text-white/90">
                   Continue with Google
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleEtlabSignIn}
+              disabled={isLoading}
+              className="mt-3 w-full rounded-[1.6rem] border border-beat-violet/25 bg-beat-violet/12 px-5 py-4 text-left shadow-[0_16px_40px_rgba(139,92,246,0.12)] transition-colors hover:border-beat-lilac/35 hover:bg-beat-violet/18 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <div className="flex items-center gap-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/90">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                </svg>
+                <p className="font-body text-base font-medium text-white/90">
+                  Continue with ETLab
                 </p>
               </div>
             </button>

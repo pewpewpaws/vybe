@@ -31,7 +31,6 @@ class SpotifyAccountsRepository(BaseRepository):
             "display_name": payload.get("display_name"),
             "access_token_ciphertext": payload.get("access_token") or payload.get("access_token_ciphertext"),
             "refresh_token_ciphertext": payload.get("refresh_token") or payload.get("refresh_token_ciphertext"),
-            "scope": payload.get("scope"),
             "token_type": payload.get("token_type"),
             "expires_at": payload.get("expires_at"),
         }

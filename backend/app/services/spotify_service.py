@@ -1646,7 +1646,6 @@ class SpotifyService:
                 "expires_at": expires_at.isoformat(),
             }
         )
-        self.profile_service.mark_spotify_connected(user_id)
         response.delete_cookie(key=self.SPOTIFY_STATE_COOKIE, path="/")
         return SpotifyConnectResponse(connected=True, profile=account)
 

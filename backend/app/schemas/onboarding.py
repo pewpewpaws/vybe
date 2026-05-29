@@ -22,7 +22,6 @@ class OnboardingStateResponse(CamelModel):
     onboarding_completed: bool
     spotify_connected: bool
     taste_song_count: int
-    vibe_profile: dict[str, float]
     taste_songs: list[TasteSongResponse]
 
 

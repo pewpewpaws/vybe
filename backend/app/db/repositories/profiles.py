@@ -19,22 +19,11 @@ class ProfilesRepository(BaseRepository):
             .execute()
             .data
         )
-        latest_vector = self.first_or_none(
-            self.client.table("user_taste_vectors")
-            .select("summary, vector, feature_version, computed_at")
-            .eq("user_id", profile["id"])
-            .order("computed_at", desc=True)
-            .limit(1)
-            .execute()
-            .data
-        )
-
         return {
             **profile,
             "name": profile.get("display_name"),
-            "etlab_verified": bool(profile.get("etlab_id")),
+            "etlab_verified": bool(profile.get("etlab_verified")),
             "spotify_connected": bool(spotify_account),
-            "vibe_profile": latest_vector.get("summary") if latest_vector else {},
         }
 
     def _build_profiles(self, profiles: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -79,14 +68,12 @@ class ProfilesRepository(BaseRepository):
             "email",
             "display_name",
             "avatar_url",
-            "onboarding_completed",
-            "is_admin",
             "google_id",
             "google_payload",
             "etlab_id",
-            "register_number",
             "etlab_payload",
-            "etlab_verified_at",
+            "academic_year",
+            "etlab_verified",
         }
         normalized = dict(payload)
         if "name" in normalized and "display_name" not in normalized:

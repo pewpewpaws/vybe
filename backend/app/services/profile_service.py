@@ -1,5 +1,3 @@
-import hashlib
-
 from fastapi import HTTPException, status
 
 from backend.app.core.settings import get_settings
@@ -33,7 +31,7 @@ class ProfileService:
         return self.repository.get_by_email(email.lower())
 
     def create_profile(self, payload: dict) -> dict:
-        return self.repository.create(self._apply_admin_flag(payload))
+        return self.repository.create(payload)
 
     def update_profile(self, profile_id: str, payload: dict) -> dict:
         if not payload:
@@ -42,63 +40,49 @@ class ProfileService:
             payload = {**payload, "display_name": payload["name"]}
         return self.repository.update(profile_id, payload)
 
-    def mark_onboarding_completed(self, profile_id: str) -> dict:
-        return self.repository.update(profile_id, {"onboarding_completed": True})
-
-    def mark_spotify_connected(self, profile_id: str) -> dict:
-        return self.get_profile_by_id(profile_id)
-
     def mark_etlab_verified(
         self,
         profile_id: str,
         *,
         etlab_id: str,
-        register_number: str,
         name: str,
-        raw_payload: dict | None = None,
+        academic_year: str | None = None,
     ) -> dict:
         payload = {
             "display_name": name,
             "etlab_id": etlab_id,
-            "register_number": register_number,
-            "etlab_payload": raw_payload or {},
-            "etlab_verified_at": "now()",  # PostgreSQL will handle this or we can use datetime.now()
+            "etlab_verified": True,
         }
-        
-        # Using a fixed timestamp string for now() or letting DB handle it via SQL is complex in repository.update
-        import datetime
-        payload["etlab_verified_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        
-        return self.repository.update(profile_id, self._apply_admin_flag(payload))
+        if academic_year:
+            payload["academic_year"] = academic_year
+        return self.repository.update(profile_id, payload)
 
     def get_or_create_from_etlab_identity(self, identity: ETLabIdentity) -> dict:
-        """Note: Per user request, Google is primary. This might be used for direct ETLab login."""
+        payload = {
+            "email": identity.email,
+            "display_name": identity.name,
+        }
+        if identity.academic_year:
+            payload["academic_year"] = identity.academic_year
+
         existing = self.get_profile_by_etlab_id(identity.etlab_id)
         if existing:
-            return self.update_profile(existing["id"], {
-                "email": identity.email,
-                "display_name": identity.name,
-                "etlab_payload": identity.raw_payload,
-            })
+            return self.update_profile(existing["id"], payload)
 
         email_match = self.get_profile_by_email(identity.email)
         if email_match:
             return self.mark_etlab_verified(
                 email_match["id"],
                 etlab_id=identity.etlab_id,
-                register_number=identity.register_number,
                 name=identity.name,
-                raw_payload=identity.raw_payload,
+                academic_year=identity.academic_year,
             )
 
-        # Rare case: Create from ETLab without Google (if allowed)
-        return self.create_profile({
-            "email": identity.email,
-            "display_name": identity.name,
+        payload.update({
             "etlab_id": identity.etlab_id,
-            "register_number": identity.register_number,
-            "etlab_payload": identity.raw_payload,
+            "etlab_verified": True,
         })
+        return self.create_profile(payload)
 
     def get_or_create_from_google_identity(self, identity: GoogleIdentity) -> dict:
         existing = self.get_profile_by_google_id(identity.sub)
@@ -116,11 +100,3 @@ class ProfileService:
             return self.update_profile(existing["id"], payload)
 
         return self.create_profile(payload)
-
-    def _apply_admin_flag(self, payload: dict) -> dict:
-        payload = dict(payload)
-        payload["is_admin"] = (
-            payload.get("email") in self.settings.admin_emails
-            or payload.get("etlab_id") in self.settings.admin_etlab_ids
-        )
-        return payload

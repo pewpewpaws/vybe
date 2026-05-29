@@ -86,28 +86,31 @@ class OnboardingService:
 
 
     def get_onboarding_state(self, profile: dict) -> dict:
-        latest_profile = self.profile_service.get_profile_by_id(profile["id"])
         taste_songs = self.list_user_taste_songs(profile["id"])
+        
+        onboarding_completed = profile.get("etlab_verified", False) and (
+            profile.get("spotify_connected", False) or len(taste_songs) >= self.MINIMUM_TASTE_SONGS
+        )
+        
         return {
-            "onboarding_completed": latest_profile["onboarding_completed"],
-            "spotify_connected": latest_profile["spotify_connected"],
+            "onboarding_completed": onboarding_completed,
+            "spotify_connected": profile.get("spotify_connected", False),
             "taste_song_count": len(taste_songs),
-            "vibe_profile": {},
             "taste_songs": taste_songs,
         }
 
     def mark_onboarding_complete(self, profile: dict) -> dict:
         taste_count = len(self.list_user_taste_songs(profile["id"]))
-        minimum_seed_met = profile["spotify_connected"] or taste_count >= self.MINIMUM_TASTE_SONGS
+        latest_profile = self.profile_service.get_profile_by_id(profile["id"])
+        minimum_seed_met = latest_profile.get("spotify_connected", False) or taste_count >= self.MINIMUM_TASTE_SONGS
         if not minimum_seed_met:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Add at least 5 songs or connect Spotify before completing onboarding.",
             )
 
-        updated = self.profile_service.mark_onboarding_completed(profile["id"])
         return {
-            "onboarding_completed": updated["onboarding_completed"],
+            "onboarding_completed": True,
             "minimum_seed_met": True,
         }
 

@@ -5,18 +5,12 @@ from backend.app.schemas.profile import ProfilePreview, ProfileResponse
 from backend.app.schemas.songs import SongRecord
 
 
-class ArtistSummary(CamelModel):
-    spotify_artist_id: str
-    name: str
-
-
 class MatchCandidateResponse(CamelModel):
     user_id: str
     name: str
     avatar_url: str | None = None
     match_score: float
-    shared_artists: list[ArtistSummary]
-    vibe_summary: str
+    shared_artists: list[str]
     request_status: str | None = None
     top_shared_song: SongRecord | None = None
 
@@ -34,8 +28,7 @@ class MatchRequestResponse(CamelModel):
     requester: ProfilePreview
     recipient: ProfilePreview
     match_score: float
-    shared_artists: list[ArtistSummary]
-    vibe_summary: str
+    shared_artists: list[str]
     status: str
     created_at: datetime
     responded_at: datetime | None = None
@@ -51,8 +44,7 @@ class AcceptedMatchResponse(CamelModel):
     id: str
     matched_user: ProfileResponse
     match_score: float
-    shared_artists: list[ArtistSummary]
-    vibe_summary: str
+    shared_artists: list[str]
     top_shared_songs: list[SongRecord]
     accepted_at: datetime
 

@@ -13,8 +13,7 @@ class ETLabIdentity:
     etlab_id: str
     email: str
     name: str
-    register_number: str
-    raw_payload: dict[str, Any]
+    academic_year: str | None = None
 
 
 class ETLabService:
@@ -46,8 +45,7 @@ class ETLabService:
                 etlab_id="test_TestUser1",
                 email="testuser1@campusbeats.test",
                 name="Test User 1",
-                register_number="TestUser1",
-                raw_payload={"test": True},
+                academic_year="2024-28",
             )
 
         if self.settings.etlab_mock_mode:
@@ -55,8 +53,7 @@ class ETLabService:
                 etlab_id=f"mock_{username}",
                 email=f"{username}@mock.vyne.app",
                 name=f"Mock User ({username})",
-                register_number=username,
-                raw_payload={"mock": True},
+                academic_year="2024-28",
             )
 
         login_url = f"{self.BASE_URL}{self.LOGIN_PATH}"
@@ -134,26 +131,32 @@ class ETLabService:
         body = self._unwrap_payload(payload)
         name = body.get("name")
         email = body.get("email")
-        register_number = body.get("admission_no") or body.get("register_number") or body.get("registerNumber")
-        etlab_id = (
-            body.get("etlab_id")
-            or body.get("student_id")
-            or body.get("user_id")
-            or register_number
-        )
+        register_no = body.get("register_no")
+        etlab_id = body.get("admission_no")
 
-        if not all([name, email, register_number, etlab_id]):
+        if not all([name, email, etlab_id, register_no]):
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="ETLab profile payload is missing required identity fields.",
+                detail="ETLab profile payload is missing required identity fields (including admission_no or register_no).",
+            )
+
+        import re
+        match = re.search(r'SCT(\d{2})', str(register_no).upper())
+        if match:
+            start_year = int(match.group(1))
+            end_year = start_year + 4
+            academic_year = f"20{start_year:02d}-{end_year:02d}"
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="ETLab profile register_no is invalid or missing SCT academic year prefix.",
             )
 
         return ETLabIdentity(
             etlab_id=str(etlab_id),
             email=str(email).lower(),
             name=str(name),
-            register_number=str(register_number),
-            raw_payload=body,
+            academic_year=academic_year,
         )
 
     def _fetch_identity_from_token(self, access_token: str) -> ETLabIdentity:

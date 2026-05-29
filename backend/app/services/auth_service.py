@@ -125,9 +125,14 @@ class AuthService:
 
     @staticmethod
     def _build_session_response(profile: dict, session: dict) -> AuthSessionResponse:
+        from backend.app.services.onboarding_service import OnboardingService
+        onboarding_service = OnboardingService()
+        profile_data = dict(profile)
+        profile_data["onboarding_completed"] = onboarding_service.get_onboarding_state(profile_data)["onboarding_completed"]
+
         return AuthSessionResponse(
             authenticated=True,
-            profile=profile,
+            profile=profile_data,
             session={
                 "id": session["id"],
                 "expires_at": session["expires_at"],
